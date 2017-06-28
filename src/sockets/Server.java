@@ -10,43 +10,46 @@ public class Server {
 
         // Port number to bind server to.
         int portNum = 11113;
-        
-        // Socket for server to listen at.
         ServerSocket listener = new ServerSocket(portNum);
+        System.out.println("Servidor corriendo en el puerto: " + portNum);
 
-        System.out.println("Server is now running at port: " + portNum);
-
-        // Simply making Server run continously.
         while (true) {
             try {
-                // Accept a client connection once Server recieves one.
+                //Aceptando peticiones
                 Socket clientSocket = listener.accept();
-
-                // Creating inout and output streams. Must creat out put stream first.
+                
+                //stream de entradas y salida
                 ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
                 ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
 
-                // Reading in Integer Object from input stream.
-                int i = (Integer) in.readObject();
-
-                //Sending response back to client
-                String response = "Integer Object Received.";
+                String nombre = (String) in.readObject();
+                String response = "Nombre recibido.";
                 out.writeObject(response);
+                System.out.println("Nombre: "+nombre);
+                
+                String file = nombre;
+                byte[] receivedData;
+                int val;
+                receivedData = new byte[1024];
+                BufferedInputStream auxi = new BufferedInputStream(clientSocket.getInputStream());
+                DataInputStream dis=new DataInputStream(clientSocket.getInputStream());
 
-                // Outputting recieved Integer Object.
-                System.out.println("Received integer: " + i);
+                BufferedOutputStream auxo = new BufferedOutputStream(new FileOutputStream(file));
+                while ((val = auxi.read(receivedData)) != -1)
+                {
+                   auxo.write(receivedData,0,val);
+                }
+                
+                dis.close();
+                auxo.close();
                 out.close();
                 in.close();
                 clientSocket.close();
-                break;
-            } finally {
-                      // Closing Server Socket now.
-                      listener.close();
-               
+            } 
+            finally {
+                // Closing Server Socket now.
+                //listener.close();
             }
-            
-             
-                
         }
     }
 
